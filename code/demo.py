@@ -1,4 +1,3 @@
-# 新增Chainlit导入
 import chainlit as cl
 import asyncio
 import httpx
@@ -14,16 +13,18 @@ from autogen_ext.models.openai import OpenAIChatCompletionClient
 from autogen_core import CancellationToken
 from dotenv import load_dotenv
 import os
-# from langchain_chroma import Chroma
+from langchain_chroma import Chroma
 # from langchain_ollama import OllamaEmbeddings
+from langchain_openai import OpenAIEmbeddings
 from openai import OpenAI
 import re
 import json
 from inference_userinput import ModelPredictor
 from inference_userinput import wrap_code_in_function
 from ast_eval_for import ASTComparator
+import traceback
 
-os.environ['SSL_CERT_FILE'] = ""
+os.environ['SSL_CERT_FILE'] = '/etc/ssl/certs/ca-certificates.crt' 
 
 
 def extract_code(msg: str) -> str:
@@ -112,11 +113,17 @@ async def init_chat():
 
     # 初始化向量数据库
     # embeddings = OllamaEmbeddings(model="bge-m3:latest")
-    # vector_store = Chroma(
-    #     persist_directory="chroma_db_train_code",
-    #     embedding_function=embeddings,
-    #     collection_name="openmp_code"
-    # )
+    embeddings = OpenAIEmbeddings(
+    model="bge-m3",  # 需与 FastChat 部署的 Embedding 模型名称一致
+    openai_api_base="http://0.0.0.0:8200/v1",  # FastChat 服务地址
+    openai_api_key="none",  # 若无鉴权，可设为任意值
+    http_client=httpx.Client(verify=False)
+    )
+    vector_store = Chroma(
+        persist_directory="chroma_db_train_code",
+        embedding_function=embeddings,
+        collection_name="openmp_code"
+    )
     
     # 创建Agent团队（每个会话独立实例）
     # termination = TextMentionTermination("TERMINATE") | MaxMessageTermination(50)
@@ -392,63 +399,51 @@ async def init_chat():
     cl.user_session.set("agent_team", agent_team)
     cl.user_session.set("vector_store", vector_store)
 
-# 消息处理函数
+
+
+# 可以运行，但是没有agent cot 隐藏
 @cl.on_message
 async def main(message: cl.Message):
-    # 获取用户代码
     user_code = message.content
-    
-    # 获取预初始化组件
     agent_team = cl.user_session.get("agent_team")
-    vector_store = cl.user_session.get("vector_store")
     
-    # 创建进度指示器
-    with cl.Step(name="OpenMP Parallelization", type="llm") as step:
-        step.input = user_code  # 显示输入代码
-        
-        # 创建流式输出容器
-        output_stream = ""
-        output_element = cl.Text(content="")
-        await output_element.send()
-        
-        # 执行处理流程
+    main_msg = cl.Message(content="🚀 开始处理 OpenMP 并行化流程...")
+    await main_msg.send()
+    
+    try:
         task = f"用户代码段:\n{user_code}\n请协调各Agent完成用户代码的OpenMP并行化代码生成。"
         stream = agent_team.run_stream(task=task)
         
-        async for msg in stream:
-            # 更新流式输出
-            output_stream += f"{msg}\n"
-            output_element.content = f"```\n{output_stream}\n```"
-            await output_element.update()
+        async for task_result in stream:  # 注意变量名修改
+            # 获取实际消息内容
+            if hasattr(task_result, 'messages'):
+                msg_content = task_result.messages[-1].content
+            else:
+                msg_content = str(task_result)
             
-            # 实时显示中间结果
-            if "CodeAgent" in msg:
+            # 流式更新主消息
+            await main_msg.stream_token(f"\n\n{msg_content}")
+            
+            # 处理特定Agent的输出
+            if "CodeAgent" in msg_content:
+                code = extract_code(msg_content)
                 await cl.Message(
-                    content=f"**Generated Code**:\n```c\n{extract_code(msg)}\n```",
-                    parent_id=output_element.id
+                    content=f"**生成的OpenMP代码**:\n```c\n{code}\n```",
+                    parent_id=main_msg.id
                 ).send()
-            elif "EvaluationAgent" in msg:
+            elif "EvaluationAgent" in msg_content:
+                evaluation = parse_evaluation(msg_content)
                 await cl.Message(
-                    content=f"**Evaluation Results**:\n{parse_evaluation(msg)}",
-                    parent_id=output_element.id
+                    content=f"**评估报告**:\n{evaluation}",
+                    parent_id=main_msg.id
                 ).send()
-        
-        # 最终处理结果
-        final_result = output_stream.split("TERMINATE")[-1].strip()
+                
+    except Exception as e:
         await cl.Message(
-            content=f"**Final Result**:\n{final_result}",
-            parent_id=output_element.id
+            content=f"❌ 处理过程中发生异常: {str(e)}",
+            parent_id=main_msg.id
         ).send()
-
-# # 辅助函数（需补充实现）
-# def extract_code(msg: str) -> str:
-#     """从消息中提取代码块"""
-#     # 实现代码解析逻辑...
-#     return msg
-
-# def parse_evaluation(msg: str) -> str:
-#     """解析评估结果"""
-#     # 实现评估结果解析...
-#     return msg
+    finally:
+        await main_msg.stream_token("\n\n✅ 流程执行完毕")
 
 
