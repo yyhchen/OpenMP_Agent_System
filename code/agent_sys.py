@@ -339,8 +339,9 @@ async def main():
     # await Console(agent_team.run_stream(task=task))
     
     stream = agent_team.run_stream(task=task)
-    for message in stream:
-        print(message)
+    print("$$"*20, "stream", type(stream), "$$"*20)
+    async for message in stream:
+        print("message", type(message), message, "\n")
 
 
 if __name__ == "__main__":
