@@ -271,8 +271,8 @@ class ModelPredictor:
     """用于初始化和管理单个代码预测的类"""
     def __init__(self):
         # 基础配置
-        self.base_model_path = r"D:\CodeLibrary\CodeBERT\codebert-base"
-        self.model_path = r"D:\CodeLibrary\CodeBERT\code\saved_models"
+        self.base_model_path = "/home/yhchen/CodeLibrary/OpenMP_Agent_System/codebert-base"
+        self.model_path = "/home/yhchen/CodeLibrary/OpenMP_Agent_System/code/saved_models"
         self.block_size = 512
         self.seed = 42
         

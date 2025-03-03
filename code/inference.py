@@ -43,9 +43,9 @@ class TextDataset(Dataset):
 
 def inference_simplified():
     # ---  配置 (请根据实际情况修改) ---
-    model_path = r"D:\CodeLibrary\CodeBERT\save_models\checkpoint-best-acc\model.bin" # 微调模型权重文件路径 (相对于脚本的路径)
-    test_data_file = r"D:\CodeLibrary\CodeBERT\dataset\valid.jsonl" # 测试数据 JSON lines 文件路径 (相对于脚本的路径)
-    pretrained_model_name = r"D:\CodeLibrary\CodeBERT\codebert-base" # 预训练 CodeBERT 模型名称
+    model_path = "/home/yhchen/CodeLibrary/OpenMP_Agent_System/save_models/checkpoint-best-acc/model.bin" # 微调模型权重文件路径 (相对于脚本的路径)
+    test_data_file = "/home/yhchen/CodeLibrary/OpenMP_Agent_System/dataset/valid.jsonl" # 测试数据 JSON lines 文件路径 (相对于脚本的路径)
+    pretrained_model_name = "D/home/yhchen/CodeLibrary/OpenMP_Agent_System/codebert-base" # 预训练 CodeBERT 模型名称
     block_size = 512 # 输入序列最大长度
     eval_batch_size = 16 # 推理批次大小
     output_predictions_file = "predictions_simplified.txt" # 输出预测结果文件名

@@ -191,7 +191,7 @@ def search_similar_code(vector_store, query, k=5):
 
 # 示例代码使用
 if __name__ == "__main__":
-    code_file_path = "dataset/processed_results.jsonl"
+    code_file_path = "/home/yhchen/CodeLibrary/OpenMP_Agent_System/dataset/processed_results.jsonl"
 
     vector_db = index_jsonl_code_to_vector_db(code_file_path)
 
