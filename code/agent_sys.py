@@ -328,9 +328,11 @@ async def main():
             for (j = 0; j <n; j++)
             {
                 mean[j] = 0.0;  
-                for (i = 0; i < n; i++)    
+                for (i = 0; i < n; i++)
+                {
                     mean[j] += data[i][j];
                     mean[j] /= float_n;
+                }    
             }
 
     """
