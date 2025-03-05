@@ -323,27 +323,38 @@ agent_team = SelectorGroupChat(
 
 async def main():
     # 模拟用户输入
+    # code = r"""
+
+    #         for (j = 0; j <n; j++)
+    #         {
+    #             mean[j] = 0.0;  
+    #             for (i = 0; i < n; i++)
+    #             {
+    #                 mean[j] += data[i][j];
+    #                 mean[j] /= float_n;
+    #             }    
+    #         }
+
+    # """
+
     code = r"""
 
-            for (j = 0; j <n; j++)
-            {
-                mean[j] = 0.0;  
-                for (i = 0; i < n; i++)
-                {
-                    mean[j] += data[i][j];
-                    mean[j] /= float_n;
-                }    
+        for (int i = 0; i < 100; i++) {
+            for (int j = 0; j < 100; j++) {
+                result[i] += matrix[i][j] * vector[j];
             }
+        }
 
     """
+
     task = f"用户代码段:\n{code}\n请协调各Agent完成用户代码的OpenMP并行化代码生成。"
 
-    # await Console(agent_team.run_stream(task=task))
+    await Console(agent_team.run_stream(task=task))
     
-    stream = agent_team.run_stream(task=task)
-    print("$$"*20, "stream", type(stream), "$$"*20)
-    async for message in stream:
-        print("message", type(message), message, "\n")
+    # stream = agent_team.run_stream(task=task)
+    # print("$$"*20, "stream", type(stream), "$$"*20)
+    # async for message in stream:
+    #     print("message", type(message), message, "\n")
 
 
 if __name__ == "__main__":
