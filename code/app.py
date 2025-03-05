@@ -173,6 +173,37 @@ def parse_evaluation(msg: str) -> str:
             """
         return "🔍 评估结果解析失败，请检查原始数据"
 
+"""
+############################################################################################################
+    增加几个 提示启动器 (类似于推荐prompt or chat)
+############################################################################################################
+"""
+@cl.set_starters
+async def set_starters():
+    return [
+        cl.Starter(
+            label="计算两数之和",
+            message="int add(int a, int b)\n{\n     return a+b;\n}",
+            icon="/public/terminal.svg",
+            ),
+
+        cl.Starter(
+            label="矩阵向量乘法",
+            message="for (int i = 0; i < 100; i++) {\n    for (int j = 0; j < 100; j++) {\n    result[i] += matrix[i][j] * vector[j];\n    }\n}",
+            icon="/public/terminal.svg",
+            ),
+        cl.Starter(
+            label="数组元素平方",
+            message="for (int i = 0; i < 1000; i++) {\n    array[i] = array[i] * array[i];\n}",
+            icon="/public/terminal.svg",
+            ),
+        cl.Starter(
+            label="数组元素求和",
+            message="for (int i = 0; i < 1000; i++) {\n    sum += array[i];\n}",
+            icon="/public/terminal.svg",
+            )
+        ]
+
 
 # 将初始化逻辑移到Chainlit的聊天启动回调
 @cl.on_chat_start
