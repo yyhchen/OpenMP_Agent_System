@@ -34,8 +34,8 @@
 ### 环境配置
 ```bash
 # 克隆项目
-git clone https://github.com/yourusername/autogen-omp.git
-cd autogen-omp
+git clone https://github.com/yyhchen/OpenMP_Agent_System.git
+cd code
 
 # 安装依赖
 pip install -r requirements.txt
@@ -105,20 +105,6 @@ graph TD
 <br>
 <br>
 
-
-## 🤝 贡献指南
-欢迎通过以下方式参与贡献：
-1. 提交Issue报告问题
-2. Fork项目并提交PR
-3. 扩展Agent能力
-
-
-<br>
-<br>
-
-
-## 📜 许可证
-本项目基于 [MIT License](LICENSE) 开源
 
 ---
 <div align="center">
