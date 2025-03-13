@@ -15,6 +15,9 @@ import os
 from langchain_chroma import Chroma
 from langchain_ollama import OllamaEmbeddings
 from openai import OpenAI
+import time
+
+start_time = time.time()
 
 load_dotenv()
 api_keys = os.getenv("API_KEY")
@@ -349,13 +352,14 @@ async def main():
 
     task = f"用户代码段:\n{code}\n请协调各Agent完成用户代码的OpenMP并行化代码生成。"
 
-    await Console(agent_team.run_stream(task=task))
+    # await Console(agent_team.run_stream(task=task))
     
-    # stream = agent_team.run_stream(task=task)
-    # print("$$"*20, "stream", type(stream), "$$"*20)
-    # async for message in stream:
-    #     print("message", type(message), message, "\n")
+    stream = agent_team.run_stream(task=task)
+    print("$$"*20, "stream", type(stream), "$$"*20)
+    async for message in stream:
+        print("message", type(message), message, "\n")
 
 
 if __name__ == "__main__":
     asyncio.run(main())
+    print(time.time() - start_time, "seconds")
